@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animales en otomí | Lección 1</title>
+    <link rel="stylesheet" href="leccion1.css">
+    <script src="leccion1.js" defer></script>
+</head>
+<body>
+
+    <header class="encabezado">
+        <h1>🐾 Animales en otomí</h1>
+        <p>Lección 1: Aprende y practica</p>
+    </header>
+
+    <main class="contenedor">
+
+        <div class="progreso">
+            <div id="barraProgreso"></div>
+        </div>
+
+        <p id="numeroPregunta">Pregunta 1 de 5</p>
+
+        <!-- PREGUNTA 1 -->
+        <section class="pregunta activa">
+            <h2>1. ¿Cómo se dice perro en otomí?</h2>
+
+            <button type="button" class="boton-escuchar" onclick="escucharAudio(this)">
+                🔊 Escuchar
+            </button>
+
+            <audio class="audio-animal" preload="auto">
+                <source src="audio/Perro.mp3" type="audio/mpeg">
+                <source src="audio/Perro.ogg" type="audio/ogg">
+                Tu navegador no puede reproducir este audio.
+            </audio>
+
+            <div class="opciones">
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐱 Mixi
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, true)">
+                    🐶 Dyo'o
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐴 Fani
+                </button>
+            </div>
+
+            <p class="mensaje"></p>
+
+            <button type="button" class="boton siguiente" onclick="siguientePregunta()" disabled>
+                Continuar
+            </button>
+        </section>
+
+        <!-- PREGUNTA 2 -->
+        <section class="pregunta">
+            <h2>2. ¿Cómo se dice gato en otomí?</h2>
+
+            <button type="button" class="boton-escuchar" onclick="escucharAudio(this)">
+                🔊 Escuchar
+            </button>
+
+            <audio class="audio-animal" preload="auto">
+                <source src="audio/Gato.mp3" type="audio/mpeg">
+                <source src="audio/Gato.ogg" type="audio/ogg">
+                Tu navegador no puede reproducir este audio.
+            </audio>
+
+            <div class="opciones">
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐂 Doro
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🫏 Juiji
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, true)">
+                    🐱 Mixi
+                </button>
+            </div>
+
+            <p class="mensaje"></p>
+
+            <button type="button" class="boton siguiente" onclick="siguientePregunta()" disabled>
+                Continuar
+            </button>
+        </section>
+
+        <!-- PREGUNTA 3 -->
+        <section class="pregunta">
+            <h2>3. ¿Cómo se dice caballo en otomí?</h2>
+
+            <button type="button" class="boton-escuchar" onclick="escucharAudio(this)">
+                🔊 Escuchar
+            </button>
+
+            <audio class="audio-animal" preload="auto">
+                <source src="audio/Caballo.mp3" type="audio/mpeg">
+                <source src="audio/Caballo.ogg" type="audio/ogg">
+                Tu navegador no puede reproducir este audio.
+            </audio>
+
+            <div class="opciones">
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐶 Dyo'o
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, true)">
+                    🐴 Fani
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐱 Mixi
+                </button>
+            </div>
+
+            <p class="mensaje"></p>
+
+            <button type="button" class="boton siguiente" onclick="siguientePregunta()" disabled>
+                Continuar
+            </button>
+        </section>
+
+        <!-- PREGUNTA 4 -->
+        <section class="pregunta">
+            <h2>4. ¿Cómo se dice burro en otomí?</h2>
+
+            <button type="button" class="boton-escuchar" onclick="escucharAudio(this)">
+                🔊 Escuchar
+            </button>
+
+            <audio class="audio-animal" preload="auto">
+                <source src="audio/Burro.mp3" type="audio/mpeg">
+                <source src="audio/Burro.ogg" type="audio/ogg">
+                Tu navegador no puede reproducir este audio.
+            </audio>
+
+            <div class="opciones">
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐴 Fani
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, true)">
+                    🫏 Juiji
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐱 Mixi
+                </button>
+            </div>
+
+            <p class="mensaje"></p>
+
+            <button type="button" class="boton siguiente" onclick="siguientePregunta()" disabled>
+                Continuar
+            </button>
+        </section>
+
+        <!-- PREGUNTA 5 -->
+        <section class="pregunta">
+            <h2>5. ¿Cómo se dice toro en otomí?</h2>
+
+            <button type="button" class="boton-escuchar" onclick="escucharAudio(this)">
+                🔊 Escuchar
+            </button>
+
+            <audio class="audio-animal" preload="auto">
+                <source src="audio/Toro.mp3" type="audio/mpeg">
+                <source src="audio/Toro.ogg" type="audio/ogg">
+                Tu navegador no puede reproducir este audio.
+            </audio>
+
+            <div class="opciones">
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🐶 Dyo'o
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, false)">
+                    🫏 Juiji
+                </button>
+                <button type="button" class="opcion" onclick="seleccionar(this, true)">
+                    🐂 Doro
+                </button>
+            </div>
+
+            <p class="mensaje"></p>
+
+            <button type="button" class="boton siguiente" onclick="siguientePregunta()" disabled>
+                Ver resultado
+            </button>
+        </section>
+
+        <!-- RESULTADO FINAL -->
+        <section id="resultado" class="resultado">
+            <h2>🎉 ¡Lección terminada!</h2>
+            <p>Tu puntuación:</p>
+            <h3 id="puntuacion">0 de 5</h3>
+            <p id="mensajeFinal"></p>
+
+            <button type="button" class="boton" onclick="reiniciar()">
+                Volver a intentarlo
+            </button>
+
+            <a href="menu.html" class="boton boton-secundario">
+                Salir de la lección
+            </a>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Aprende Otomí de Temoaya</p>
+    </footer>
+
+</body>
+</html>

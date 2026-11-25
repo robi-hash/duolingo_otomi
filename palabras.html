@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palabras Hñähñu</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    min-height: 100vh;
+}
+
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.juego {
+    width: 95%;
+    max-width: 750px;
+    margin: 45px auto;
+    text-align: center;
+}
+
+.progreso {
+    color: #555;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.animal {
+    width: 170px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+.pista {
+    font-size: 23px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.letras {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    min-height: 115px;
+}
+
+.letra {
+    width: 85px;
+    height: 100px;
+    border: none;
+    border-radius: 5px;
+    background: #666;
+    color: white;
+    font-size: 65px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 3px #999;
+}
+
+.letra:hover {
+    background: #555;
+}
+
+.respuesta {
+    border: 3px solid #999;
+    border-radius: 15px;
+    min-height: 150px;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.espacio {
+    width: 85px;
+    height: 100px;
+    border: none;
+    border-radius: 5px;
+    background: #e2e2e2;
+    color: white;
+    font-size: 55px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+}
+
+.espacio.lleno {
+    background: #2196e9;
+}
+
+.espacio.correcto {
+    background: #21b86b;
+}
+
+.espacio.incorrecto {
+    background: #e74c3c;
+}
+
+.marca {
+    font-size: 23px;
+    margin-top: 5px;
+}
+
+.mensaje {
+    min-height: 35px;
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.controles {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.control {
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    background: #673ab7;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.control:hover {
+    background: #512da8;
+}
+
+.final {
+    display: none;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.final h2 {
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 500px) {
+    .letra, .espacio {
+        width: 58px;
+        height: 70px;
+        font-size: 43px;
+    }
+
+    .marca {
+        font-size: 18px;
+    }
+
+    .respuesta {
+        gap: 5px;
+    }
+
+    .juego {
+        margin-top: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="encabezado">
+    <span id="tiempo">0:00</span>
+    <span>✓ <span id="puntos">0</span></span>
+</div>
+
+<main class="juego" id="juego">
+
+    <div class="progreso" id="progreso">1 de 5</div>
+
+    <img id="animal" class="animal" src="" alt="Animal">
+
+    <div class="pista" id="pista">
+        Forma la palabra en otomí
+    </div>
+
+    <div class="letras" id="letras"></div>
+
+    <div class="respuesta" id="respuesta"></div>
+
+    <div class="mensaje" id="mensaje"></div>
+
+    <div class="controles">
+        <button class="control" onclick="reiniciarPalabra()">
+            Borrar
+        </button>
+
+        <button class="control" onclick="comprobar()">
+            Comprobar
+        </button>
+    </div>
+
+</main>
+
+<div class="final" id="final">
+    <h2>¡Felicidades!</h2>
+    <p>Terminaste las cinco palabras.</p>
+    <h3 id="resultado"></h3>
+    <br>
+    <button class="control" onclick="location.reload()">
+        Volver a jugar
+    </button>
+</div>
+
+<script>
+const animales = [
+    {
+        nombre: "Caballo",
+        palabra: "Fani",
+        imagen: "imagenes/caballo.jpg"
+    },
+    {
+        nombre: "Conejo",
+        palabra: "Kjua",
+        imagen: "imagenes/conejo.jpg"
+    },
+    {
+        nombre: "Gato",
+        palabra: "Mixi",
+        imagen: "imagenes/gato.jpg"
+    },
+    {
+        nombre: "Perro",
+        palabra: "Dyo'o",
+        imagen: "imagenes/perro.jpg"
+    },
+    {
+        nombre: "Vaca",
+        palabra: "Baga",
+        imagen: "imagenes/vaca.jpg"
+    }
+];
+
+let ronda = 0;
+let puntos = 0;
+let seleccionadas = [];
+let letrasActuales = [];
+let segundos = 0;
+let terminado = false;
+
+const tiempo = document.getElementById("tiempo");
+const puntosTexto = document.getElementById("puntos");
+const progreso = document.getElementById("progreso");
+const imagen = document.getElementById("animal");
+const pista = document.getElementById("pista");
+const letras = document.getElementById("letras");
+const respuesta = document.getElementById("respuesta");
+const mensaje = document.getElementById("mensaje");
+
+setInterval(() => {
+    if (!terminado) {
+        segundos++;
+
+        let minutos = Math.floor(segundos / 60);
+        let seg = segundos % 60;
+
+        tiempo.textContent =
+            minutos + ":" + String(seg).padStart(2, "0");
+    }
+}, 1000);
+
+function mezclar(array) {
+    let copia = [...array];
+
+    for (let i = copia.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+
+    return copia;
+}
+
+function cargarRonda() {
+    if (ronda >= animales.length) {
+        terminarJuego();
+        return;
+    }
+
+    const animal = animales[ronda];
+
+    seleccionadas = [];
+    letrasActuales = mezclar([...animal.palabra]);
+
+    progreso.textContent = (ronda + 1) + " de 5";
+
+    imagen.src = animal.imagen;
+    imagen.alt = animal.nombre;
+
+    pista.textContent = "Forma la palabra en otomí";
+
+    mensaje.textContent = "";
+    letras.innerHTML = "";
+    respuesta.innerHTML = "";
+
+    letrasActuales.forEach((letra, indice) => {
+        const boton = document.createElement("button");
+
+        boton.className = "letra";
+        boton.textContent = letra;
+
+        boton.onclick = () => seleccionarLetra(indice);
+
+        letras.appendChild(boton);
+    });
+
+    for (let i = 0; i < animal.palabra.length; i++) {
+        const espacio = document.createElement("button");
+
+        espacio.className = "espacio";
+        espacio.onclick = () => quitarLetra(i);
+
+        respuesta.appendChild(espacio);
+    }
+}
+
+function seleccionarLetra(indice) {
+    if (seleccionadas.some(item => item.indice === indice)) {
+        return;
+    }
+
+    if (seleccionadas.length >= letrasActuales.length) {
+        return;
+    }
+
+    seleccionadas.push({
+        indice: indice,
+        letra: letrasActuales[indice]
+    });
+
+    actualizarTablero();
+}
+
+function quitarLetra(posicion) {
+    if (!seleccionadas[posicion]) {
+        return;
+    }
+
+    seleccionadas.splice(posicion, 1);
+    actualizarTablero();
+    mensaje.textContent = "";
+}
+
+function actualizarTablero() {
+    const botones = letras.children;
+
+    for (let i = 0; i < botones.length; i++) {
+        const usada = seleccionadas.some(
+            item => item.indice === i
+        );
+
+        botones[i].style.visibility =
+            usada ? "hidden" : "visible";
+    }
+
+    const espacios = respuesta.children;
+    const palabraCorrecta = animales[ronda].palabra;
+
+    for (let i = 0; i < espacios.length; i++) {
+        const espacio = espacios[i];
+
+        espacio.className = "espacio";
+        espacio.innerHTML = "";
+
+        if (seleccionadas[i]) {
+            const letra = seleccionadas[i].letra;
+            const esCorrecta = letra === palabraCorrecta[i];
+
+            espacio.classList.add(
+                esCorrecta ? "correcto" : "incorrecto"
+            );
+
+            espacio.innerHTML = `
+                <span>${letra}</span>
+                <span class="marca">
+                    ${esCorrecta ? "✓" : "✕"}
+                </span>
+            `;
+        }
+    }
+}
+
+function reiniciarPalabra() {
+    seleccionadas = [];
+    actualizarTablero();
+    mensaje.textContent = "";
+}
+
+function comprobar() {
+    const palabraFormada = seleccionadas
+        .map(item => item.letra)
+        .join("");
+
+    const palabraCorrecta = animales[ronda].palabra;
+
+    if (palabraFormada.length !== palabraCorrecta.length) {
+        mensaje.textContent = "¡Coloca todas las letras!";
+        mensaje.style.color = "#e58b16";
+        return;
+    }
+
+    if (palabraFormada === palabraCorrecta) {
+        puntos++;
+
+        puntosTexto.textContent = puntos;
+
+        mensaje.textContent = "¡Excelente! Todas las letras son correctas.";
+        mensaje.style.color = "#159447";
+
+        ronda++;
+
+        setTimeout(cargarRonda, 1100);
+    } else {
+        mensaje.textContent =
+            "Hay letras incorrectas. ¡Inténtalo otra vez!";
+
+        mensaje.style.color = "#e53935";
+    }
+}
+
+function terminarJuego() {
+    terminado = true;
+
+    document.getElementById("juego").style.display = "none";
+    document.getElementById("final").style.display = "block";
+
+    document.getElementById("resultado").textContent =
+        "Puntuación: " + puntos + " de 5";
+}
+
+cargarRonda();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,962 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aventura Hñähñu | El camino del Jaguar</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --verde: #365c3b;
+    --verde-claro: #64834e;
+    --tierra: #a75e3d;
+    --naranja: #d88a4d;
+    --crema: #fff0d2;
+    --morado: #70477f;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(140deg, #f2e5ca, #d6dfc3);
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 15px;
+    color: #423326;
+}
+
+h1 {
+    color: var(--verde);
+    margin: 12px 0 5px;
+    font-size: clamp(25px, 5vw, 38px);
+}
+
+.subtitulo {
+    color: #76563d;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+#contenedor {
+    width: 950px;
+    max-width: 100%;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+    border: 5px solid #fff0d2;
+    border-radius: 17px;
+    box-shadow: 0 8px 25px rgba(55, 44, 30, .22);
+}
+
+canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #a9c8bd;
+}
+
+#menu {
+    position: absolute;
+    inset: 0;
+    background: rgba(39, 61, 43, .91);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    z-index: 5;
+}
+
+#menu h2 {
+    font-size: clamp(25px, 5vw, 40px);
+    color: #f6d18b;
+}
+
+#menu p {
+    color: #fff3df;
+    max-width: 420px;
+    line-height: 1.6;
+}
+
+.jaguar-logo {
+    font-size: 65px;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 12px;
+    transition: .2s;
+    touch-action: manipulation;
+}
+
+button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+#botonJugar {
+    background: #d88a4d;
+    color: white;
+    padding: 14px 35px;
+    font-size: 20px;
+}
+
+.controles-superiores {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 13px auto;
+}
+
+.control {
+    background: var(--verde);
+    color: white;
+    padding: 10px 18px;
+    font-size: 14px;
+}
+
+.instrucciones {
+    color: #5d4a34;
+    margin: 12px 0;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.controles-movil {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin: 15px auto;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.control-movil {
+    width: 68px;
+    height: 58px;
+    background: var(--verde);
+    color: white;
+    font-size: 27px;
+    touch-action: none;
+}
+
+.control-salto {
+    background: var(--tierra);
+    width: 105px;
+    font-size: 16px;
+}
+
+.estado {
+    color: var(--verde);
+    font-weight: bold;
+    min-height: 22px;
+    margin: 8px;
+}
+
+@media (min-width: 750px) {
+    .controles-movil {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    body {
+        padding: 8px;
+    }
+
+    .control {
+        padding: 9px 12px;
+    }
+
+    .controles-movil {
+        gap: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h1>🐆 AVENTURA HÑÄNHU</h1>
+<p class="subtitulo">El camino del Jaguar · Una aventura por la tierra otomí</p>
+
+<div id="contenedor">
+
+    <canvas id="juego" width="900" height="500"></canvas>
+
+    <div id="menu">
+        <div class="jaguar-logo">🐆</div>
+        <h2 id="titulo">EL CAMINO DEL JAGUAR</h2>
+        <p id="descripcion">
+            Acompaña al jaguar en una aventura por las montañas.
+            Recolecta semillas, esquiva los obstáculos y alcanza la meta.
+        </p>
+        <button id="botonJugar">COMENZAR AVENTURA</button>
+    </div>
+
+</div>
+
+<div class="controles-superiores">
+    <button class="control" id="pausar">⏸️ Pausar</button>
+    <button class="control" id="reiniciar">🔄 Reiniciar</button>
+</div>
+
+<div class="instrucciones">
+    ⬅️ ➡️ Mover al jaguar &nbsp; | &nbsp; ESPACIO o ↑ Saltar
+    <br>
+    🌽 Recolecta semillas &nbsp; | &nbsp; 🌵 Evita los obstáculos
+</div>
+
+<div class="controles-movil">
+    <button class="control-movil" id="izquierda">◀</button>
+    <button class="control-movil control-salto" id="saltar">SALTAR ⬆</button>
+    <button class="control-movil" id="derecha">▶</button>
+</div>
+
+<p class="estado" id="estado">¡Prepárate para la aventura!</p>
+
+<script>
+const canvas = document.getElementById("juego");
+const ctx = canvas.getContext("2d");
+
+const menu = document.getElementById("menu");
+const titulo = document.getElementById("titulo");
+const descripcion = document.getElementById("descripcion");
+const botonJugar = document.getElementById("botonJugar");
+const estado = document.getElementById("estado");
+
+const ANCHO = canvas.width;
+const ALTO = canvas.height;
+const GRAVEDAD = 0.65;
+const META = 3500;
+
+let jugador;
+let plataformas = [];
+let coleccionables = [];
+let obstaculos = [];
+let puntosControl = [];
+
+let teclas = {};
+let puntos = 0;
+let vidas = 3;
+let recolectados = 0;
+let camara = 0;
+let jugando = false;
+let pausado = false;
+let terminado = false;
+let invulnerable = 0;
+let tiempo = 0;
+let ultimoTiempo = 0;
+let raf = null;
+let checkpoint = 50;
+
+const colores = {
+    verde: "#365c3b",
+    tierra: "#a75e3d",
+    crema: "#fff0d2",
+    amarillo: "#e8bd66"
+};
+
+function crearMundo() {
+    plataformas = [
+        {x: 0, y: 430, w: 430, h: 70},
+        {x: 510, y: 375, w: 190, h: 30},
+        {x: 790, y: 320, w: 190, h: 30},
+        {x: 1080, y: 405, w: 330, h: 95},
+        {x: 1480, y: 350, w: 200, h: 30},
+        {x: 1770, y: 295, w: 190, h: 30},
+        {x: 2070, y: 420, w: 380, h: 80},
+        {x: 2550, y: 355, w: 220, h: 30},
+        {x: 2850, y: 310, w: 200, h: 30},
+        {x: 3150, y: 410, w: 500, h: 90}
+    ];
+
+    coleccionables = [
+        {x: 220, y: 370, tomado: false},
+        {x: 570, y: 315, tomado: false},
+        {x: 850, y: 260, tomado: false},
+        {x: 1190, y: 340, tomado: false},
+        {x: 1550, y: 290, tomado: false},
+        {x: 1830, y: 235, tomado: false},
+        {x: 2200, y: 350, tomado: false},
+        {x: 2620, y: 295, tomado: false},
+        {x: 2910, y: 250, tomado: false},
+        {x: 3300, y: 345, tomado: false},
+        {x: 3440, y: 345, tomado: false}
+    ];
+
+    obstaculos = [
+        {x: 610, y: 345, w: 32, h: 30},
+        {x: 1260, y: 375, w: 38, h: 30},
+        {x: 2260, y: 390, w: 40, h: 30},
+        {x: 2930, y: 280, w: 32, h: 30},
+        {x: 3260, y: 380, w: 40, h: 30}
+    ];
+
+    puntosControl = [
+        {x: 1450, activado: false},
+        {x: 2500, activado: false}
+    ];
+}
+
+function reiniciarDatos() {
+    jugador = {
+        x: 50,
+        y: 350,
+        w: 46,
+        h: 40,
+        vx: 0,
+        vy: 0,
+        suelo: false,
+        direccion: 1,
+        caminar: 0
+    };
+
+    puntos = 0;
+    vidas = 3;
+    recolectados = 0;
+    camara = 0;
+    invulnerable = 0;
+    tiempo = 0;
+    checkpoint = 50;
+
+    crearMundo();
+    actualizarEstado();
+}
+
+function iniciar() {
+    if (raf !== null) {
+        cancelAnimationFrame(raf);
+        raf = null;
+    }
+
+    reiniciarDatos();
+
+    jugando = true;
+    pausado = false;
+    terminado = false;
+
+    menu.style.display = "none";
+    document.getElementById("pausar").textContent = "⏸️ Pausar";
+    estado.textContent = "🐆 ¡El jaguar comienza su aventura!";
+
+    ultimoTiempo = performance.now();
+    raf = requestAnimationFrame(bucle);
+}
+
+function actualizarEstado() {
+    estado.textContent =
+        "❤️ Vidas: " + vidas +
+        " | ⭐ Puntos: " + puntos +
+        " | 🌽 Semillas: " + recolectados + "/" + coleccionables.length;
+}
+
+function rectangulosColision(a, b) {
+    return (
+        a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y
+    );
+}
+
+function dibujarFondo() {
+    const gradiente = ctx.createLinearGradient(0, 0, 0, 500);
+    gradiente.addColorStop(0, "#a6c8c4");
+    gradiente.addColorStop(1, "#f2d8ad");
+
+    ctx.fillStyle = gradiente;
+    ctx.fillRect(0, 0, ANCHO, ALTO);
+
+    // Sol
+    ctx.fillStyle = "#f3c76c";
+    ctx.beginPath();
+    ctx.arc(750, 95, 42, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Montañas lejanas
+    dibujarMontana(0, 310, 180, 100, "#93a98b");
+    dibujarMontana(250, 330, 210, 145, "#819b7b");
+    dibujarMontana(550, 320, 190, 120, "#91a784");
+    dibujarMontana(750, 320, 180, 135, "#819c78");
+
+    // Nubes
+    ctx.fillStyle = "rgba(255,255,255,.75)";
+    dibujarNube(120, 85);
+    dibujarNube(490, 120);
+
+    // Colinas
+    ctx.fillStyle = "#8b9f6b";
+    ctx.beginPath();
+    ctx.ellipse(160, 450, 300, 100, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#6f8b59";
+    ctx.beginPath();
+    ctx.ellipse(720, 455, 350, 100, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Magueyes decorativos
+    for (let i = 0; i < 8; i++) {
+        const x = (i * 190 - camara * 0.35 % 1500 + 1500) % 1000;
+        dibujarMaguey(x, 420);
+    }
+
+    // Decoración geométrica superior
+    ctx.fillStyle = "rgba(87,75,48,.25)";
+    for (let x = 0; x < ANCHO; x += 38) {
+        ctx.beginPath();
+        ctx.moveTo(x + 9, 8);
+        ctx.lineTo(x + 18, 18);
+        ctx.lineTo(x + 9, 28);
+        ctx.lineTo(x, 18);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+function dibujarMontana(x, y, ancho, alto, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + ancho / 2, y - alto);
+    ctx.lineTo(x + ancho, y);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function dibujarNube(x, y) {
+    ctx.beginPath();
+    ctx.arc(x, y, 19, 0, Math.PI * 2);
+    ctx.arc(x + 22, y - 8, 24, 0, Math.PI * 2);
+    ctx.arc(x + 49, y, 18, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function dibujarMaguey(x, y) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    ctx.strokeStyle = "#486c43";
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+
+    for (let i = -3; i <= 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(i * 12, -35, i * 18, -58 - Math.abs(i) * 3);
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+function dibujarPlataformas() {
+    plataformas.forEach(p => {
+        const x = p.x - camara;
+
+        if (x + p.w < 0 || x > ANCHO) return;
+
+        ctx.fillStyle = "#815137";
+        ctx.fillRect(x, p.y, p.w, p.h);
+
+        ctx.fillStyle = "#5c7b46";
+        ctx.fillRect(x, p.y, p.w, 13);
+
+        ctx.fillStyle = "#d5a45e";
+        for (let i = 10; i < p.w; i += 35) {
+            ctx.fillRect(x + i, p.y + 20, 9, 5);
+        }
+
+        // Detalles geométricos
+        ctx.fillStyle = "#e3bd78";
+        for (let i = 15; i < p.w - 10; i += 45) {
+            ctx.beginPath();
+            ctx.moveTo(x + i, p.y + 37);
+            ctx.lineTo(x + i + 9, p.y + 45);
+            ctx.lineTo(x + i, p.y + 53);
+            ctx.lineTo(x + i - 9, p.y + 45);
+            ctx.closePath();
+            ctx.fill();
+        }
+    });
+}
+
+function dibujarColeccionables() {
+    coleccionables.forEach(c => {
+        if (c.tomado) return;
+
+        const x = c.x - camara;
+        if (x < -30 || x > ANCHO + 30) return;
+
+        ctx.font = "27px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("🌽", x, c.y);
+    });
+}
+
+function dibujarObstaculos() {
+    obstaculos.forEach(o => {
+        const x = o.x - camara;
+
+        if (x < -50 || x > ANCHO + 50) return;
+
+        ctx.font = "32px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("🌵", x + o.w / 2, o.y + o.h);
+    });
+}
+
+function dibujarCheckpoints() {
+    puntosControl.forEach(p => {
+        const x = p.x - camara;
+
+        ctx.fillStyle = "#785139";
+        ctx.fillRect(x, 330, 5, 100);
+
+        ctx.fillStyle = p.activado ? "#f2c85e" : "#d88a4d";
+        ctx.beginPath();
+        ctx.moveTo(x + 5, 332);
+        ctx.lineTo(x + 42, 345);
+        ctx.lineTo(x + 5, 358);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.font = "17px Arial";
+        ctx.fillText(p.activado ? "⭐" : "🚩", x + 20, 315);
+    });
+}
+
+function dibujarJaguar() {
+    const x = jugador.x - camara;
+    const y = jugador.y;
+
+    ctx.save();
+
+    if (jugador.direccion === -1) {
+        ctx.translate(x + jugador.w, 0);
+        ctx.scale(-1, 1);
+    } else {
+        ctx.translate(x, 0);
+    }
+
+    // Parpadeo de invulnerabilidad
+    if (invulnerable > 0 && Math.floor(tiempo / 90) % 2 === 0) {
+        ctx.globalAlpha = .4;
+    }
+
+    const movimiento = jugador.suelo && jugador.vx !== 0
+        ? Math.sin(jugador.caminar) * 3
+        : 0;
+
+    // Cola
+    ctx.strokeStyle = "#b77a32";
+    ctx.lineWidth = 8;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(9, y + 25);
+    ctx.quadraticCurveTo(-10, y + 10, -4, y + 1);
+    ctx.stroke();
+
+    ctx.fillStyle = "#372b20";
+    ctx.beginPath();
+    ctx.arc(-4, y + 1, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Patas
+    ctx.fillStyle = "#a66b2e";
+    ctx.fillRect(8, y + 30 + movimiento, 9, 12);
+    ctx.fillRect(29, y + 30 - movimiento, 9, 12);
+
+    // Cuerpo
+    ctx.fillStyle = "#d99b45";
+    ctx.beginPath();
+    ctx.ellipse(22, y + 25, 21, 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Manchas del cuerpo
+    ctx.fillStyle = "#392c20";
+
+    const manchas = [
+        [10, 19], [20, 15], [29, 21],
+        [13, 29], [25, 31], [34, 26]
+    ];
+
+    manchas.forEach(m => {
+        ctx.beginPath();
+        ctx.arc(m[0], y + m[1], 2.5, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Cabeza
+    ctx.fillStyle = "#e1ad58";
+    ctx.beginPath();
+    ctx.arc(38, y + 13, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Orejas
+    ctx.fillStyle = "#a66b2e";
+    ctx.beginPath();
+    ctx.arc(30, y + 4, 5, 0, Math.PI * 2);
+    ctx.arc(44, y + 4, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hocico
+    ctx.fillStyle = "#fff0d2";
+    ctx.beginPath();
+    ctx.ellipse(43, y + 17, 7, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Nariz
+    ctx.fillStyle = "#30251d";
+    ctx.beginPath();
+    ctx.arc(48, y + 15, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ojo
+    ctx.fillStyle = "#211d17";
+    ctx.beginPath();
+    ctx.arc(40, y + 11, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Manchas de la cabeza
+    ctx.fillStyle = "#392c20";
+    ctx.beginPath();
+    ctx.arc(32, y + 12, 2, 0, Math.PI * 2);
+    ctx.arc(37, y + 5, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
+function dibujarMeta() {
+    const x = META - camara;
+
+    if (x < -60 || x > ANCHO + 60) return;
+
+    ctx.fillStyle = "#69472e";
+    ctx.fillRect(x, 270, 8, 160);
+
+    ctx.fillStyle = "#f0c36a";
+    ctx.fillRect(x + 8, 270, 75, 42);
+
+    ctx.fillStyle = "#365c3b";
+    ctx.font = "bold 13px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("META", x + 45, 296);
+
+    ctx.font = "28px Arial";
+    ctx.fillText("🏁", x + 15, 258);
+}
+
+function dibujarHUD() {
+    ctx.fillStyle = "rgba(255,240,210,.9)";
+    ctx.fillRect(12, 40, 260, 65);
+
+    ctx.fillStyle = "#365c3b";
+    ctx.font = "bold 18px Arial";
+    ctx.textAlign = "left";
+
+    ctx.fillText("❤️ Vidas: " + vidas, 24, 67);
+    ctx.fillText("⭐ Puntos: " + puntos, 24, 93);
+}
+
+function dibujarMundo() {
+    ctx.clearRect(0, 0, ANCHO, ALTO);
+
+    dibujarFondo();
+    dibujarPlataformas();
+    dibujarColeccionables();
+    dibujarObstaculos();
+    dibujarCheckpoints();
+    dibujarMeta();
+    dibujarJaguar();
+    dibujarHUD();
+}
+
+function moverJugador() {
+    if (invulnerable > 0) {
+        invulnerable -= 16;
+    }
+
+    jugador.vx = 0;
+
+    if (teclas.ArrowRight || teclas.KeyD) {
+        jugador.vx = 4.5;
+        jugador.direccion = 1;
+    }
+
+    if (teclas.ArrowLeft || teclas.KeyA) {
+        jugador.vx = -4.5;
+        jugador.direccion = -1;
+    }
+
+    if (jugador.vx !== 0) {
+        jugador.caminar += .18;
+    }
+
+    // Movimiento horizontal
+    jugador.x += jugador.vx;
+
+    jugador.x = Math.max(0, Math.min(jugador.x, META + 100));
+
+    // Gravedad
+    const anteriorY = jugador.y;
+    jugador.vy += GRAVEDAD;
+    jugador.y += jugador.vy;
+
+    jugador.suelo = false;
+
+    // Colisiones con plataformas
+    plataformas.forEach(p => {
+        const horizontal =
+            jugador.x + jugador.w > p.x &&
+            jugador.x < p.x + p.w;
+
+        const anteriorAbajo = anteriorY + jugador.h;
+        const nuevoAbajo = jugador.y + jugador.h;
+
+        if (
+            horizontal &&
+            jugador.vy >= 0 &&
+            anteriorAbajo <= p.y + 5 &&
+            nuevoAbajo >= p.y
+        ) {
+            jugador.y = p.y - jugador.h;
+            jugador.vy = 0;
+            jugador.suelo = true;
+        }
+    });
+
+    // Caída
+    if (jugador.y > ALTO + 100) {
+        perderVida();
+        return;
+    }
+
+    // Recolectar semillas
+    coleccionables.forEach(c => {
+        if (c.tomado) return;
+
+        const objeto = {
+            x: c.x - 10,
+            y: c.y - 25,
+            w: 25,
+            h: 30
+        };
+
+        if (rectangulosColision(jugador, objeto)) {
+            c.tomado = true;
+            puntos += 10;
+            recolectados++;
+            actualizarEstado();
+        }
+    });
+
+    // Obstáculos
+    if (invulnerable <= 0) {
+        for (const o of obstaculos) {
+            if (rectangulosColision(jugador, o)) {
+                perderVida();
+                return;
+            }
+        }
+    }
+
+    // Checkpoints
+    puntosControl.forEach(p => {
+        if (!p.activado && jugador.x >= p.x) {
+            p.activado = true;
+            checkpoint = p.x + 30;
+            estado.textContent = "🚩 ¡Punto de control alcanzado!";
+        }
+    });
+
+    // Meta
+    if (jugador.x >= META) {
+        finalizar(true);
+        return;
+    }
+
+    // Cámara
+    camara = Math.max(0, Math.min(jugador.x - 250, META - 600));
+}
+
+function perderVida() {
+    if (invulnerable > 0) return;
+
+    vidas--;
+    invulnerable = 1500;
+
+    jugador.x = checkpoint;
+    jugador.y = 250;
+    jugador.vy = 0;
+    jugador.vx = 0;
+
+    if (vidas <= 0) {
+        finalizar(false);
+    } else {
+        estado.textContent = "¡Cuidado! Perdiste una vida. Continúa la aventura.";
+        actualizarEstado();
+    }
+}
+
+function finalizar(victoria) {
+    jugando = false;
+    pausado = false;
+    terminado = true;
+
+    if (raf !== null) {
+        cancelAnimationFrame(raf);
+        raf = null;
+    }
+
+    menu.style.display = "flex";
+
+    if (victoria) {
+        titulo.textContent = "🎉 ¡AVENTURA COMPLETADA!";
+        descripcion.textContent =
+            "¡El jaguar llegó a su destino! Recolectaste " +
+            recolectados + " semillas y obtuviste " + puntos + " puntos.";
+        botonJugar.textContent = "JUGAR OTRA VEZ";
+        estado.textContent = "🏆 ¡Felicidades, completaste la aventura!";
+    } else {
+        titulo.textContent = "🐆 FIN DE LA AVENTURA";
+        descripcion.textContent =
+            "El jaguar necesita descansar. Conseguistes " +
+            puntos + " puntos y " + recolectados + " semillas.";
+        botonJugar.textContent = "INTENTAR OTRA VEZ";
+        estado.textContent = "¡Puedes intentarlo de nuevo!";
+    }
+}
+
+function pausarJuego() {
+    if (!jugando || terminado) return;
+
+    pausado = !pausado;
+
+    document.getElementById("pausar").textContent =
+        pausado ? "▶️ Continuar" : "⏸️ Pausar";
+
+    if (pausado) {
+        estado.textContent = "⏸️ Aventura pausada";
+        if (raf !== null) {
+            cancelAnimationFrame(raf);
+            raf = null;
+        }
+    } else {
+        estado.textContent = "🐆 ¡Continúa tu aventura!";
+        ultimoTiempo = performance.now();
+        raf = requestAnimationFrame(bucle);
+    }
+}
+
+function bucle(tiempoActual) {
+    if (!jugando || pausado) {
+        raf = null;
+        return;
+    }
+
+    const delta = Math.min(tiempoActual - ultimoTiempo, 32);
+    ultimoTiempo = tiempoActual;
+    tiempo += delta;
+
+    moverJugador();
+    dibujarMundo();
+
+    if (jugando && !pausado) {
+        raf = requestAnimationFrame(bucle);
+    } else {
+        raf = null;
+    }
+}
+
+// Teclado
+document.addEventListener("keydown", e => {
+    if (["ArrowRight", "ArrowLeft", "ArrowUp", "Space"].includes(e.code)) {
+        e.preventDefault();
+    }
+
+    teclas[e.code] = true;
+
+    if (
+        (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") &&
+        jugando &&
+        !pausado &&
+        jugador.suelo
+    ) {
+        jugador.vy = -13;
+        jugador.suelo = false;
+    }
+});
+
+document.addEventListener("keyup", e => {
+    teclas[e.code] = false;
+});
+
+window.addEventListener("blur", () => {
+    teclas = {};
+
+    if (jugando && !pausado) {
+        pausarJuego();
+    }
+});
+
+// Controles táctiles
+function configurarBoton(id, codigo) {
+    const boton = document.getElementById(id);
+
+    boton.addEventListener("pointerdown", e => {
+        e.preventDefault();
+
+        teclas[codigo] = true;
+
+        if (codigo === "Space" && jugando && !pausado && jugador.suelo) {
+            jugador.vy = -13;
+            jugador.suelo = false;
+        }
+
+        boton.setPointerCapture(e.pointerId);
+    });
+
+    function soltar() {
+        teclas[codigo] = false;
+    }
+
+    boton.addEventListener("pointerup", soltar);
+    boton.addEventListener("pointercancel", soltar);
+    boton.addEventListener("lostpointercapture", soltar);
+}
+
+configurarBoton("izquierda", "ArrowLeft");
+configurarBoton("derecha", "ArrowRight");
+configurarBoton("saltar", "Space");
+
+// Botones principales
+botonJugar.addEventListener("click", iniciar);
+
+document.getElementById("pausar").addEventListener("click", pausarJuego);
+
+document.getElementById("reiniciar").addEventListener("click", () => {
+    iniciar();
+});
+
+// Pantalla inicial
+reiniciarDatos();
+dibujarMundo();
+</script>
+
+</body>
+</html>
+

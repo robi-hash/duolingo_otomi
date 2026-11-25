@@ -1,0 +1,134 @@
+
+/* DISEÑO GENERAL */
+
+* {
+    margin: 0;
+        padding: 0;
+            box-sizing: border-box;
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                    background-color: #f5f0e8;
+                        color: #333;
+                            line-height: 1.6;
+                            }
+
+                            /* ENCABEZADO */
+
+                            .encabezado {
+                                background: linear-gradient(135deg, #502258, #854a91);
+                                    color: white;
+                                        text-align: center;
+                                            padding: 35px 15px;
+                                            }
+
+                                            .encabezado h1 {
+                                                font-size: 32px;
+                                                    margin-bottom: 8px;
+                                                    }
+
+                                                    .encabezado p {
+                                                        font-size: 16px;
+                                                        }
+
+                                                        /* MENÚ DE NAVEGACIÓN */
+
+                                                        .navegacion {
+                                                            background-color: #35163b;
+                                                                display: flex;
+                                                                    justify-content: center;
+                                                                        flex-wrap: wrap;
+                                                                            gap: 8px;
+                                                                                padding: 12px;
+                                                                                }
+
+                                                                                .navegacion a {
+                                                                                    color: white;
+                                                                                        text-decoration: none;
+                                                                                            padding: 8px 12px;
+                                                                                                border-radius: 6px;
+                                                                                                    transition: 0.3s;
+                                                                                                    }
+
+                                                                                                    .navegacion a:hover {
+                                                                                                        background-color: #854a91;
+                                                                                                        }
+
+                                                                                                        /* CONTENIDO PRINCIPAL */
+
+                                                                                                        main {
+                                                                                                            width: 90%;
+                                                                                                                max-width: 1000px;
+                                                                                                                    margin: 25px auto;
+                                                                                                                    }
+
+                                                                                                                    .tarjeta {
+                                                                                                                        background-color: white;
+                                                                                                                            padding: 25px;
+                                                                                                                                margin-bottom: 20px;
+                                                                                                                                    border-radius: 12px;
+                                                                                                                                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+                                                                                                                                        }
+
+                                                                                                                                        .tarjeta h2 {
+                                                                                                                                            color: #502258;
+                                                                                                                                                margin-bottom: 12px;
+                                                                                                                                                }
+
+                                                                                                                                                .tarjeta p {
+                                                                                                                                                    margin-bottom: 15px;
+                                                                                                                                                    }
+
+                                                                                                                                                    /* BOTONES */
+
+                                                                                                                                                    .boton {
+                                                                                                                                                        display: inline-block;
+                                                                                                                                                            background-color: #502258;
+                                                                                                                                                                color: white;
+                                                                                                                                                                    text-decoration: none;
+                                                                                                                                                                        padding: 11px 18px;
+                                                                                                                                                                            border-radius: 8px;
+                                                                                                                                                                                margin-top: 8px;
+                                                                                                                                                                                    transition: 0.3s;
+                                                                                                                                                                                    }
+
+                                                                                                                                                                                    .boton:hover {
+                                                                                                                                                                                        background-color: #854a91;
+                                                                                                                                                                                        }
+
+                                                                                                                                                                                        /* PIE DE PÁGINA */
+
+                                                                                                                                                                                        footer {
+                                                                                                                                                                                            background-color: #35163b;
+                                                                                                                                                                                                color: white;
+                                                                                                                                                                                                    text-align: center;
+                                                                                                                                                                                                        padding: 18px;
+                                                                                                                                                                                                            margin-top: 30px;
+                                                                                                                                                                                                            }
+
+                                                                                                                                                                                                            /* ADAPTACIÓN A CELULARES */
+
+                                                                                                                                                                                                            @media (max-width: 600px) {
+                                                                                                                                                                                                                .encabezado h1 {
+                                                                                                                                                                                                                        font-size: 26px;
+                                                                                                                                                                                                                            }
+
+                                                                                                                                                                                                                                .navegacion {
+                                                                                                                                                                                                                                        flex-direction: column;
+                                                                                                                                                                                                                                                text-align: center;
+                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                        .navegacion a {
+                                                                                                                                                                                                                                                                display: block;
+                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                        main {
+                                                                                                                                                                                                                                                                                width: 94%;
+                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                        .tarjeta {
+                                                                                                                                                                                                                                                                                                padding: 18px;
+                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                    
